@@ -91,7 +91,9 @@ class Database:
             cursor.execute(query)
         result = cursor.fetchone()
         conn.close()
-        return result
+        if result:
+            return dict(result)
+        return None
 
     def fetch_all(self, query, params=None):
         conn = self.get_connection()
@@ -102,4 +104,4 @@ class Database:
             cursor.execute(query)
         results = cursor.fetchall()
         conn.close()
-        return results
+        return [dict(row) for row in results]
