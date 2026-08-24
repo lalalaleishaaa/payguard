@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayGuard - AI Revenue Recovery</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0e17;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #1a2332;
+            border-radius: 12px;
+        }
+        .header h1 { font-size: 28px; font-weight: 700; color: #fff; }
+        .header .subtitle { font-size: 14px; color: #94a3b8; margin-top: 4px; }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: #1a2332;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #2d3748;
+        }
+        .metric-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+        .metric-value { font-size: 32px; font-weight: 700; color: #fff; }
+        .metric-value.positive { color: #10b981; }
+        .metric-value.warning { color: #f59e0b; }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background: #1a2332;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #2d3748;
+        }
+        .panel h3 { font-size: 18px; margin-bottom: 16px; color: #fff; }
+        .feed { max-height: 400px; overflow-y: auto; }
+        .feed-item {
+            padding: 12px;
+            border-bottom: 1px solid #2d3748;
+            font-size: 14px;
+        }
+        .feed-item .action { font-weight: 600; color: #60a5fa; }
+        .feed-item .success { color: #10b981; font-weight: 600; }
+        .feed-item .failed { color: #ef4444; font-weight: 600; }
+        .feed-item .amount { font-weight: 600; }
+        .feed-item .time { color: #64748b; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>PayGuard</h1>
+            <div class="subtitle">AI-Powered Revenue Recovery Agent</div>
+        </div>
+    </div>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Revenue at Risk</div>
+            <div class="metric-value warning">INR {{ "%.2f"|format(metrics.total_at_risk) }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Recovered Revenue</div>
+            <div class="metric-value positive">INR {{ "%.2f"|format(metrics.recovered_amount) }}</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Recovery Rate</div>
+            <div class="metric-value">{{ metrics.recovery_rate }}%</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Transactions Recovered</div>
+            <div class="metric-value">{{ metrics.total_recovered }} / {{ metrics.total_failed }}</div>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="panel">
+            <h3>Recovery Feed</h3>
+            <div class="feed">
+                {% for action in recent_actions %}
+                <div class="feed-item">
+                    <span class="action">{{ action.action_type }}</span>
+                    {% if action.success %}
+                    <span class="success">SUCCESS</span>
+                    {% else %}
+                    <span class="failed">FAILED</span>
+                    {% endif %}
+                    <br>
+                    <span class="amount">INR {{ "%.2f"|format(action.amount) }}</span>
+                    <span> - {{ action.customer_name }}</span>
+                    <br>
+                    <span class="time">{{ action.timestamp }}</span>
+                    {% if action.fallback_triggered %}
+                    <br><span class="failed">Fallback triggered</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="panel">
+            <h3>LLM vs Fallback</h3>
+            <div id="pieChart"></div>
+        </div>
+    </div>
+
+    <script>
+        const llmData = [{
+            values: [{{ llm_stats.llm_actions }}, {{ llm_stats.fallback_actions }}],
+            labels: ['LLM Actions', 'Fallback Actions'],
+            type: 'pie',
+            marker: { colors: ['#10b981', '#f59e0b'] }
+        }];
+        Plotly.newPlot('pieChart', llmData, {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#fff' }
+        });
+    </script>
+</body>
+</html>
