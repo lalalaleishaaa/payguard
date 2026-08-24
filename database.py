@@ -64,9 +64,9 @@ class Database:
                 timestamp TEXT NOT NULL
             );
 
-            CREATE INDEX idx_transactions_status ON transactions(status);
-            CREATE INDEX idx_transactions_timestamp ON transactions(timestamp);
-            CREATE INDEX idx_recovery_transaction ON recovery_actions(transaction_id);
+            CREATE INDEX IF NOT EXISTS idx_transactions_status ON transactions(status);
+            CREATE INDEX IF NOT EXISTS idx_transactions_timestamp ON transactions(timestamp);
+            CREATE INDEX IF NOT EXISTS idx_recovery_transaction ON recovery_actions(transaction_id);
         """)
         
         conn.commit()
