@@ -32,6 +32,8 @@ PayGuard automatically:
 | Fallback triggered | 0 times |
 
 ## Architecture
+
+```text
 +-------------+     +-------------+     +-------------+
 |  Detection  |---->|  Diagnosis  |---->|  Recovery   |
 |             |     |             |     |             |
@@ -49,6 +51,7 @@ PayGuard automatically:
                 |  is logged with   |
                 |  reasoning        |
                 +-------------------+
+```
 
 ## Recovery Actions
 
@@ -80,6 +83,8 @@ When LLM is unavailable, a rule-based classifier handles common patterns:
 - Complete audit trail for every action
 
 ## Testing
+
+```text
 11 passed in 0.15s
 
 test_database_connection PASSED
@@ -93,6 +98,7 @@ test_fallback_high_value PASSED
 test_fallback_authentication PASSED
 test_fallback_default PASSED
 test_config_values PASSED
+```
 
 ## Tech Stack
 
