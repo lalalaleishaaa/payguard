@@ -23,6 +23,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
+    - name: Generate test data
+      run: |
+        python data_generator.py
+    
     - name: Run tests
       run: |
         python -m pytest tests/ -v
