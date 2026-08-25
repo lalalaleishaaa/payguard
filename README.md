@@ -32,27 +32,67 @@ PayGuard automatically:
 | Fallback triggered | 0 times |
 
 ## Architecture
++-------------+     +-------------+     +-------------+
+|  Detection  |---->|  Diagnosis  |---->|  Recovery   |
+|             |     |             |     |             |
+|  Scan DB    |     |  LLM Call   |     |  Execute    |
+|  for failed |     |  + Fallback |     |  Action     |
+|  txns       |     |  rules      |     |             |
++-------------+     +-------------+     +-------------+
+       |                   |                   |
+       +-------------------+-------------------+
+                           |
+                           v
+                +-------------------+
+                |   Audit Trail     |
+                |  Every decision   |
+                |  is logged with   |
+                |  reasoning        |
+                +-------------------+
 
-```
-+-------------------------------------------------------------+
-|                     PayGuard Agent                          |
-|                                                             |
-|  +-------------+    +-------------+    +-------------+      |
-|  |  Detection  | -> |  Diagnosis  | -> |  Recovery   |      |
-|  |             |    |             |    |             |      |
-|  | - Fetch     |    | - LLM call  |    | - Execute   |      |
-|  |   failed    |    | - Fallback  |    |   action    |      |
-|  |   txns      |    |   rules     |    | - Log audit |      |
-|  +-------------+    +-------------+    +-------------+      |
-|                                                             |
-|  +-----------------------------------------------------+    |
-|  |                 Audit Trail                         |    |
-|  |  - Every decision logged                            |    |
-|  |  - Fallback triggers recorded                       |    |
-|  |  - Recovery outcomes tracked                        |    |
-|  +-----------------------------------------------------+    |
-+-------------------------------------------------------------+
-```
+## Recovery Actions
+
+| Action | Description | When Used |
+|--------|-------------|-----------|
+| `retry_now` | Immediate retry | Network errors, OTP expiry |
+| `retry_later` | Delayed retry | Bank maintenance windows |
+| `switch_method` | Suggest alternative payment | Card declined, insufficient funds |
+| `send_reminder` | Personalized follow-up | High-value customers |
+| `do_not_recover` | Skip recovery | Unrecoverable errors |
+
+## Fallback System
+
+When LLM is unavailable, a rule-based classifier handles common patterns:
+
+| Error Code | Action | Confidence |
+|-----------|--------|-----------|
+| `upi_timeout` | retry_now | 0.85 |
+| `card_declined` | switch_method | 0.70 |
+| `otp_expired` | retry_now | 0.65 |
+| High-value + any error | send_reminder | 0.75 |
+| Unknown | do_not_recover | 0.30 |
+
+## Safety Constraints
+
+- Maximum 2 recovery attempts per transaction
+- High-value threshold: INR 5,000+ gets extra attention
+- Exponential backoff for LLM retries (2s, 4s, 8s)
+- Complete audit trail for every action
+
+## Testing
+11 passed in 0.15s
+
+test_database_connection PASSED
+test_failed_transactions_exist PASSED
+test_customers_exist PASSED
+test_recovery_actions_logged PASSED
+test_audit_log_exists PASSED
+test_fallback_network_issue PASSED
+test_fallback_insufficient_funds PASSED
+test_fallback_high_value PASSED
+test_fallback_authentication PASSED
+test_fallback_default PASSED
+test_config_values PASSED
 
 ## Tech Stack
 
@@ -60,37 +100,7 @@ PayGuard automatically:
 - **AI/LLM**: Claude (via OpenRouter)
 - **Database**: SQLite
 - **Testing**: pytest (11 tests)
-- **Dashboard**: HTML, CSS, Plotly
-
-## Key Features
-
-### 1. Intelligent Recovery Actions
-- `retry_now`: Immediate retry for transient failures
-- `retry_later`: Delayed retry for maintenance windows
-- `switch_method`: Suggest alternative payment method
-- `send_reminder`: Personalized follow-up for high-value customers
-- `do_not_recover`: Skip unrecoverable transactions
-
-### 2. Multi-Layer Fallback System
-- Primary: Claude LLM analysis
-- Fallback: Rule-based classifier for common patterns
-- Ensures system works even when LLM is unavailable
-
-### 3. Complete Audit Trail
-Every action is logged with:
-- Transaction ID
-- Action type
-- Confidence score
-- LLM reasoning
-- Fallback triggered (yes/no)
-- Success/failure
-- Timestamp
-
-### 4. Safety Constraints
-- Maximum 2 recovery attempts per transaction
-- High-value threshold (INR 5,000+) for extra attention
-- Exponential backoff for LLM retries
-- Deterministic fallback rules
+- **Demo**: HTML/CSS/JS scroll-story
 
 ## Setup Instructions
 
@@ -101,17 +111,8 @@ Every action is logged with:
 ### Installation
 
 ```bash
-# Clone repository
 git clone https://github.com/lalalaleishaaa/payguard.git
 cd payguard
-
-# Create virtual environment
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Create .env file
-echo "ANTHROPIC_API_KEY=your_key_here" > .env
-echo "DATABASE_PATH=payguard.db" >> .env
