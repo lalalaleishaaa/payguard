@@ -108,6 +108,16 @@ test_fallback_default PASSED
 test_config_values PASSED
 ```
 
+
+## Production Integration
+
+PayGuard includes a Razorpay webhook handler (`webhook.py`) that:
+- Verifies webhook signatures using HMAC-SHA256
+- Extracts payment details from Razorpay webhook payload
+- Triggers recovery agent for failed payments
+- Logs everything to audit trail
+- Includes health check endpoint
+
 ## Tech Stack
 
 - **Backend**: Python, FastAPI
