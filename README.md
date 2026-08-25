@@ -1,7 +1,13 @@
 # PayGuard - AI Revenue Recovery Agent
+
+![Tests](https://github.com/lalalaleishaaa/payguard/actions/workflows/tests.yml/badge.svg)
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Deployment](https://img.shields.io/badge/Deployment-Vercel-black.svg)
+
 ## Live Demo
 
-🔗 [View Live Demo]https://payguard-gules.vercel.app/
+🔗 [View Live Demo](https://payguard-gules.vercel.app/)
 
 ## Overview
 
@@ -22,6 +28,15 @@ PayGuard automatically:
 2. **Diagnoses** root cause using Claude LLM
 3. **Recovers** revenue through intelligent actions
 4. **Logs** every decision for complete auditability
+
+## How It Works
+
+1. **Transaction Fails** → Customer's payment fails with error code
+2. **Detection** → PayGuard scans database for failed transactions
+3. **Diagnosis** → Claude LLM analyzes error + customer context
+4. **Fallback** → Rule-based classifier takes over if LLM unavailable
+5. **Recovery** → Agent executes optimal action (retry/switch/reminder)
+6. **Audit** → Every decision logged with reasoning and confidence
 
 ## Results
 
@@ -109,6 +124,7 @@ test_config_values PASSED
 ```
 
 
+
 ## Production Integration
 
 PayGuard includes a Razorpay webhook handler (`webhook.py`) that:
@@ -126,6 +142,24 @@ PayGuard includes a Razorpay webhook handler (`webhook.py`) that:
 - **Testing**: pytest (11 tests)
 - **Demo**: HTML/CSS/JS scroll-story
 
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Dashboard |
+| `/api/metrics` | GET | Recovery metrics |
+| `/api/recent-actions` | GET | Recent recovery actions |
+| `/razorpay-webhook` | POST | Webhook handler |
+| `/health` | GET | Health check |
+
+## Design Decisions
+
+- **Why LLM + Fallback?** LLM provides intelligence, fallback ensures reliability
+- **Why SQLite?** Zero-config, perfect for demo, easy to swap for PostgreSQL
+- **Why OpenRouter?** Access to Claude without managing API credits
+- **Why 2 max retries?** Prevents customer harassment and API abuse
+- **Why audit everything?** Fintech requires complete traceability
+
 ## Setup Instructions
 
 ### Prerequisites
@@ -140,3 +174,44 @@ cd payguard
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
+
+## Project Structure
+
+payguard/
+├── .github/
+│ └── workflows/
+│ └── tests.yml # CI/CD pipeline
+├── agent.py # Recovery agent (core logic)
+├── app.py # FastAPI backend
+├── webhook.py # Razorpay webhook handler
+├── config.py # Configuration settings
+├── data_generator.py # Synthetic data generator
+├── database.py # Database layer
+├── fallback.py # Rule-based fallback classifier
+├── llm_client.py # LLM API wrapper
+├── payguard_story.html # Scroll-story demo
+├── index.html # Vercel entry point
+├── demo.gif # Demo animation
+├── requirements.txt # Dependencies
+├── README.md
+├── LICENSE
+├── vercel.json # Vercel config
+├── templates/
+│ └── dashboard.html # Dashboard template
+└── tests/
+└── test_agent.py # 11 tests
+
+
+## Future Improvements
+
+- Razorpay webhook integration for real-time processing
+- ML-based success probability prediction
+- A/B testing for recovery strategies
+- Multi-currency support
+- Email/SMS integration for reminders
+- PostgreSQL migration for production scale
+- Docker containerization
+
+## License
+
+MIT
