@@ -34,6 +34,11 @@ PayGuard automatically:
 | Average recovery time | < 5 seconds |
 | Fallback triggered | 0 times |
 
+
+## Demo
+
+![PayGuard Demo](demo.gif)
+
 ## Architecture
 
 ```text
