@@ -9,9 +9,9 @@ db = Database()
 
 @app.get("/", response_class=HTMLResponse)
 async def dashboard():
-    metrics = get_metrics()
-    recent_actions = get_recent_actions()
-    llm_stats = get_llm_stats()
+    with open("payguard_story.html", "r", encoding="utf-8") as f:
+        html_content = f.read()
+    return HTMLResponse(content=html_content)
     
     html = f"""
     <!DOCTYPE html>

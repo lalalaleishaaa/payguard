@@ -3,4 +3,5 @@ __pycache__/
 *.pyc
 .env
 payguard.db
+.pytest_cache/
 .DS_Store
