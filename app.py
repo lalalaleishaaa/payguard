@@ -4,6 +4,14 @@ from database import Database
 import uvicorn
 import os
 
+# Generate data if database is empty
+from database import Database
+db_check = Database()
+count = db_check.fetch_one("SELECT COUNT(*) as c FROM transactions")["c"]
+if count == 0:
+    import subprocess
+    subprocess.run(["python", "data_generator.py"])
+
 app = FastAPI(title="PayGuard", description="AI Revenue Recovery Agent")
 db = Database()
 
