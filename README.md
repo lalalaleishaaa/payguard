@@ -9,11 +9,6 @@
 
 🔗 [View Live Demo](https://payguard-gules.vercel.app/)
 
-
-## Live Backend
-
-🔗 [Live API](https://payguard-production-f07c.up.railway.app/api/metrics)
-
 ## Overview
 
 PayGuard is an AI-powered revenue recovery agent built for Razorpay that automatically detects failed transactions, diagnoses root causes using LLM intelligence, and executes recovery actions to convert lost revenue into recovered payments.
