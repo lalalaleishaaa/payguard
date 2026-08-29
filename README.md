@@ -212,6 +212,11 @@ payguard/
 - PostgreSQL migration for production scale
 - Docker containerization
 
+├── CONTRIBUTING.md         # Contribution guide
+├── Dockerfile              # Docker setup
+├── docker-compose.yml      # Docker compose
+├── metrics.py              # Performance metrics
+
 ## License
 
 MIT
